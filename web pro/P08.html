@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <title>FootprintsFusion</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #007bff;
+            text-transform: uppercase;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        form {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        input[type="text"], input[type="number"] {
+            padding: 5px;
+            width: calc(25% - 10px);
+            margin-bottom: 10px;
+        }
+
+        .editing input {
+            width: calc(100% - 10px);
+        }
+
+        .btn-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .btn-container button {
+            margin-bottom: 10px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            min-height: 20px; 
+        }
+
+        td.name-cell {
+            max-height: 50px; 
+            overflow-y: auto; 
+        }
+
+        td.action-cell {
+            align-items: top;
+        }
+
+        td.items-left-cell {
+            align-items: top;
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body ng-controller="myController">
+
+<h1>FootprintsFusion</h1>
+
+<div class="btn-container">
+    <button ng-click="fetchData()">Fetch Products</button>
+</div>
+
+<form ng-submit="addItem()">
+    <input type="number" ng-model="newItem.id" placeholder="ID" required>
+    <input type="text" ng-model="newItem.name" placeholder="Name" required>
+    <input type="text" ng-model="newItem.brand" placeholder="Brand" required>
+    <input type="text" ng-model="newItem.gender" placeholder="Gender" required>
+    <input type="text" ng-model="newItem.category" placeholder="Category" required>
+    <input type="number" ng-model="newItem.size" placeholder="Size" required>
+    <input type="text" ng-model="newItem.color" placeholder="Color" required>
+    <input type="number" ng-model="newItem.price" placeholder="Price" required>
+    <input type="number" ng-model="newItem.discountPrice" placeholder="Discount Price">
+    <input type="number" ng-model="newItem.items_left" placeholder="Items Left" required>
+    <button type="submit">Add Product</button>
+</form>
+
+<div class="table-container">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Brand</th>
+            <th>Gender</th>
+            <th>Category</th>
+            <th>Size</th>
+            <th>Color</th>
+            <th>Price</th>
+            <th>Discount Price</th>
+            <th>Items Left</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in items" ng-class="{ 'editing': item.editing }">
+            <td>{{ item.id }}</td>
+            <td class="name-cell">
+                <span ng-if="!item.editing">{{ item.name }}</span>
+                <input ng-if="item.editing" type="text" ng-model="item.name" required>
+            </td>
+            <td>
+                <span ng-if="!item.editing">{{ item.brand }}</span>
+                <input ng-if="item.editing" type="text" ng-model="item.brand" required>
+            </td>
+            <td>
+                <span ng-if="!item.editing">{{ item.gender }}</span>
+                <input ng-if="item.editing" type="text" ng-model="item.gender" required>
+            </td>
+            <td>
+                <span ng-if="!item.editing">{{ item.category }}</span>
+                <input ng-if="item.editing" type="text" ng-model="item.category" required>
+            </td>
+            <td>
+                <span ng-if="!item.editing">{{ item.size }}</span>
+                <input ng-if="item.editing" type="text" ng-model="item.size" required>
+            </td>
+            <td>
+                <span ng-if="!item.editing">{{ item.color }}</span>
+                <input ng-if="item.editing" type="text" ng-model="item.color" required>
+            </td>
+            <td>
+                <span ng-if="!item.editing">{{ item.price }}</span>
+                <input ng-if="item.editing" type="number" ng-model="item.price" required>
+            </td>
+            <td>
+                <span ng-if="!item.editing">{{ item.discountPrice }}</span>
+                <input ng-if="item.editing" type="number" ng-model="item.discountPrice">
+            </td>
+            <td class="items-left-cell">
+                <span ng-if="!item.editing">{{ item.items_left }}</span>
+                <input ng-if="item.editing" type="number" ng-model="item.items_left" required>
+                
+            </td>
+            <td class="action-cell">
+                <div class="action-buttons">
+                    
+                    
+                        <button ng-if="item.editing" ng-click="saveEdit(item)">Save</button>
+                        <button ng-if="item.editing" ng-click="cancelEdit(item)">Cancel</button>
+                        <button ng-if="!item.editing" ng-click="editItem(item)">Edit</button>
+                        <button ng-click="deleteItem(item.id)">Delete</button>
+                   
+                    
+                    
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    angular.module('myApp', [])
+        .controller('myController', ['$scope', '$http', function($scope, $http) {
+            $scope.items = [];
+            $scope.newItem = {};
+
+            $scope.fetchData = function() {
+                $http.get('/datafetch')
+                .then(function(response) {
+                        $scope.items = response.data;
+                        console.log(response.data);
+                    })
+                    .catch(function(error) {
+                        console.error('Error fetching data:', error);
+                    });
+            };
+
+            $scope.addItem = function() {
+                $http.post('/dataadd', $scope.newItem)
+                    .then(function(response) {
+                        $scope.items.push(response.data);
+                        $scope.newItem = {};
+                    })
+                    .catch(function(error) {
+                        console.error('Error adding item:', error);
+                    });
+            };
+
+            $scope.editItem = function(item) {
+    // Prompt the user for confirmation before editing
+    if (confirm("Are you sure you want to edit this item?")) {
+        item.editing = true;
+        // Create a copy of the item to avoid modifying the original
+        $scope.editItemData = angular.copy(item);
+    }
+};
+
+            $scope.saveEdit = function(item) {
+                // Send an HTTP request to update the item in the database
+                $http.put('/dataupdate/' + item.id, item)
+                    .then(function(response) {
+                        item.editing = false;
+                    })
+                    .catch(function(error) {
+                        console.error('Error updating item:', error);
+                    });
+            };
+
+            $scope.cancelEdit = function(item) {
+                // Restore the item to its original state
+                angular.copy($scope.editItemData, item);
+                item.editing = false;
+            };
+
+            $scope.deleteItem = function(itemId) {
+                $http.delete('/datadelete/' + itemId)
+                    .then(function(response){
+                        $scope.items = $scope.items.filter(function(item) {
+                            return item.id !== itemId;
+                        });
+                    })
+                    .catch(function(error) {
+                        console.error('Error deleting item:', error);
+                    });
+            };
+
+            $scope.fetchData();
+        }]);
+</script>
+
+</body>
+</html>
